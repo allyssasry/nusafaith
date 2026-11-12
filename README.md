@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NUSAFAITH – Edisi Kasmaran | Personalized Greeting Card
 
-## Getting Started
+Website interaktif formulir feedback dan **Personalized Greeting Card** untuk acara **NUSAFAITH – Edisi Kasmaran** menggunakan Next.js (App Router), Tailwind CSS, Supabase, Lucide React, dan `html-to-image`.
 
-First, run the development server:
+## Alur Utama
+
+1. Peserta mengisi identitas (`Nama Lengkap`, `Divisi`) dan feedback acara (`Pendapat`, `Rating Bintang 1–5`, `Hal Paling Berkesan` opsional).
+2. Data divalidasi dan disimpan ke tabel `nusafaith_feedback` di Supabase.
+3. Jika penyimpanan berhasil, website menampilkan preview Greeting Card yang telah dipersonalisasi dengan nama lengkap peserta di dalam desain kartu asli.
+4. Peserta dapat mengunduh Greeting Card sebagai gambar **PNG resolusi tinggi (`3072 x 1728 px`)**, membagikannya melalui WhatsApp (Web Share API / fallback download PNG), atau membuat kartu lagi.
+
+## Pengaturan Awal
+
+### 1. Setup Tabel & RLS di Supabase
+
+1. Buka [Supabase Dashboard](https://supabase.com/dashboard) dan pilih/buat project Anda.
+2. Buka menu **SQL Editor** lalu jalankan isi file [`supabase/schema.sql`](./supabase/schema.sql).
+3. Script tersebut akan membuat tabel `public.nusafaith_feedback` serta mengaktifkan **Row Level Security (RLS)** dengan policy publik khusus `INSERT` saja (pengunjung tidak dapat membaca data peserta lain).
+
+### 2. Konfigurasi Environment Variables
+
+Salin `.env.example` menjadi `.env.local`:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Lalu isi nilai berikut dari **Project Settings → API** di Supabase:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+> **Penting:** Jangan pernah menaruh `service_role` key di frontend atau variabel `NEXT_PUBLIC_*`.
 
-## Learn More
+### 3. Mengelola Daftar Divisi
 
-To learn more about Next.js, take a look at the following resources:
+Edit array `DIVISIONS` di [`src/config/divisions.ts`](./src/config/divisions.ts) untuk menambah, mengubah, atau mengurutkan pilihan divisi. Opsi **"Lainnya"** otomatis ditambahkan di bagian akhir dropdown.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 4. Menjalankan Aplikasi
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm install
+npm run dev
+```
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Buka `http://localhost:3000` di browser Anda.
