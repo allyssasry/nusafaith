@@ -17,16 +17,16 @@ interface GreetingCardPreviewProps {
 
 // Koordinat area plaque krem pada template asli 1920 x 1080
 const PLAQUE_BOX = {
-  left: 590,
-  top: 438,
-  width: 759,
-  height: 71,
+  left: 540,
+  top: 480,
+  width: 843,
+  height: 78,
 } as const;
 
-const MAX_SINGLE_LINE_WIDTH = 725;
-const MAX_FONT_SIZE = 44;
-const MIN_SINGLE_LINE_FONT_SIZE = 24;
-const MIN_MULTI_LINE_FONT_SIZE = 20;
+const MAX_SINGLE_LINE_WIDTH = 760;
+const MAX_FONT_SIZE = 36;
+const MIN_SINGLE_LINE_FONT_SIZE = 22;
+const MIN_MULTI_LINE_FONT_SIZE = 18;
 
 export function GreetingCardPreview({
   fullName,
@@ -161,9 +161,9 @@ export function GreetingCardPreview({
             className="block h-full w-full object-cover"
           />
 
-          {/* Nama peserta terintegrasi di dalam plaque tengah desain asli */}
+          {/* Nama peserta terintegrasi di dalam kotak plaque tengah desain asli */}
           <div
-            className="absolute flex items-center justify-center px-3 text-center"
+            className="absolute flex items-center justify-center px-6 text-center"
             style={{
               left: `${PLAQUE_BOX.left}px`,
               top: `${PLAQUE_BOX.top}px`,
@@ -178,12 +178,11 @@ export function GreetingCardPreview({
                 fontFamily: `${playfairDisplay.style.fontFamily}, Georgia, serif`,
                 fontWeight: 600,
                 fontSize: `${textLayout.fontSize}px`,
-                lineHeight: textLayout.multiline ? 1.12 : 1.05,
+                lineHeight: textLayout.multiline ? 1.15 : 1,
                 whiteSpace: textLayout.multiline ? "normal" : "nowrap",
-                letterSpacing: "0.015em",
+                letterSpacing: "0.01em",
                 color: "#08403A",
-                textShadow: "0 1px 0 rgba(255, 255, 255, 0.5)",
-                paddingBottom: "2px",
+                textShadow: "0 1px 0 rgba(255, 255, 255, 0.45)",
               }}
             >
               {fullName}

@@ -97,7 +97,7 @@ export function FeedbackForm({ onSuccess }: FeedbackFormProps) {
         }
         setSubmitError(
           result.errorMessage ??
-            "Terjadi kesalahan saat menyimpan feedback. Silakan coba lagi."
+          "Terjadi kesalahan saat menyimpan feedback. Silakan coba lagi."
         );
         return;
       }
@@ -179,13 +179,12 @@ export function FeedbackForm({ onSuccess }: FeedbackFormProps) {
             disabled={isSubmitting}
             value={values.fullName}
             onChange={(e) => updateField("fullName", e.target.value)}
-            placeholder="Contoh: Allyssa Nur Ayu Soraya"
+            placeholder="Masukkan Nama Lengkap"
             aria-invalid={Boolean(fieldErrors.fullName)}
-            className={`w-full rounded-xl border bg-[#FCFBF8] px-4 py-3 text-sm sm:text-base text-[#132E29] placeholder:text-[#9AA09A] transition focus:bg-white focus:outline-none focus:ring-2 ${
-              fieldErrors.fullName
-                ? "border-[#B8423E] focus:border-[#B8423E] focus:ring-[#B8423E]/20"
-                : "border-[#DDD4BE] focus:border-[#0B433B] focus:ring-[#0B433B]/15"
-            }`}
+            className={`w-full rounded-xl border bg-[#FCFBF8] px-4 py-3 text-sm sm:text-base text-[#132E29] placeholder:text-[#9AA09A] transition focus:bg-white focus:outline-none focus:ring-2 ${fieldErrors.fullName
+              ? "border-[#B8423E] focus:border-[#B8423E] focus:ring-[#B8423E]/20"
+              : "border-[#DDD4BE] focus:border-[#0B433B] focus:ring-[#0B433B]/15"
+              }`}
           />
           <p className="text-xs text-[#6B6E66]">
             Nama ini akan langsung tercantum di desain greeting card digital
@@ -215,13 +214,11 @@ export function FeedbackForm({ onSuccess }: FeedbackFormProps) {
               value={values.division}
               onChange={(e) => updateField("division", e.target.value)}
               aria-invalid={Boolean(fieldErrors.division)}
-              className={`w-full appearance-none rounded-xl border bg-[#FCFBF8] px-4 py-3 pr-10 text-sm sm:text-base transition focus:bg-white focus:outline-none focus:ring-2 ${
-                values.division ? "text-[#132E29]" : "text-[#8A918B]"
-              } ${
-                fieldErrors.division
+              className={`w-full appearance-none rounded-xl border bg-[#FCFBF8] px-4 py-3 pr-10 text-sm sm:text-base transition focus:bg-white focus:outline-none focus:ring-2 ${values.division ? "text-[#132E29]" : "text-[#8A918B]"
+                } ${fieldErrors.division
                   ? "border-[#B8423E] focus:border-[#B8423E] focus:ring-[#B8423E]/20"
                   : "border-[#DDD4BE] focus:border-[#0B433B] focus:ring-[#0B433B]/15"
-              }`}
+                }`}
             >
               <option value="" disabled>
                 Pilih divisi Anda...
@@ -262,11 +259,10 @@ export function FeedbackForm({ onSuccess }: FeedbackFormProps) {
                 onChange={(e) => updateField("otherDivision", e.target.value)}
                 placeholder="Contoh: Corporate Communication / Anak Perusahaan"
                 aria-invalid={Boolean(fieldErrors.otherDivision)}
-                className={`w-full rounded-xl border bg-white px-4 py-2.5 text-sm text-[#132E29] placeholder:text-[#9AA09A] transition focus:outline-none focus:ring-2 ${
-                  fieldErrors.otherDivision
-                    ? "border-[#B8423E] focus:border-[#B8423E] focus:ring-[#B8423E]/20"
-                    : "border-[#DDD4BE] focus:border-[#0B433B] focus:ring-[#0B433B]/15"
-                }`}
+                className={`w-full rounded-xl border bg-white px-4 py-2.5 text-sm text-[#132E29] placeholder:text-[#9AA09A] transition focus:outline-none focus:ring-2 ${fieldErrors.otherDivision
+                  ? "border-[#B8423E] focus:border-[#B8423E] focus:ring-[#B8423E]/20"
+                  : "border-[#DDD4BE] focus:border-[#0B433B] focus:ring-[#0B433B]/15"
+                  }`}
               />
               {fieldErrors.otherDivision && (
                 <p className="text-sm font-medium text-[#B8423E]" role="alert">
@@ -315,11 +311,10 @@ export function FeedbackForm({ onSuccess }: FeedbackFormProps) {
             onChange={(e) => updateField("feedback", e.target.value)}
             placeholder="Tuliskan kesan, pesan, dan saran Anda untuk acara ini..."
             aria-invalid={Boolean(fieldErrors.feedback)}
-            className={`w-full resize-y rounded-xl border bg-[#FCFBF8] px-4 py-3 text-sm sm:text-base text-[#132E29] placeholder:text-[#9AA09A] transition focus:bg-white focus:outline-none focus:ring-2 ${
-              fieldErrors.feedback
-                ? "border-[#B8423E] focus:border-[#B8423E] focus:ring-[#B8423E]/20"
-                : "border-[#DDD4BE] focus:border-[#0B433B] focus:ring-[#0B433B]/15"
-            }`}
+            className={`w-full resize-y rounded-xl border bg-[#FCFBF8] px-4 py-3 text-sm sm:text-base text-[#132E29] placeholder:text-[#9AA09A] transition focus:bg-white focus:outline-none focus:ring-2 ${fieldErrors.feedback
+              ? "border-[#B8423E] focus:border-[#B8423E] focus:ring-[#B8423E]/20"
+              : "border-[#DDD4BE] focus:border-[#0B433B] focus:ring-[#0B433B]/15"
+              }`}
           />
           <div className="flex items-center justify-between text-xs text-[#6B6E66]">
             <span>Kesan, pesan, maupun saran untuk panitia.</span>
@@ -367,11 +362,10 @@ export function FeedbackForm({ onSuccess }: FeedbackFormProps) {
             onChange={(e) => updateField("memorableMoment", e.target.value)}
             placeholder="Ceritakan momen, kutipan materi, atau suasana yang paling berkesan..."
             aria-invalid={Boolean(fieldErrors.memorableMoment)}
-            className={`w-full resize-y rounded-xl border bg-[#FCFBF8] px-4 py-3 text-sm sm:text-base text-[#132E29] placeholder:text-[#9AA09A] transition focus:bg-white focus:outline-none focus:ring-2 ${
-              fieldErrors.memorableMoment
-                ? "border-[#B8423E] focus:border-[#B8423E] focus:ring-[#B8423E]/20"
-                : "border-[#DDD4BE] focus:border-[#0B433B] focus:ring-[#0B433B]/15"
-            }`}
+            className={`w-full resize-y rounded-xl border bg-[#FCFBF8] px-4 py-3 text-sm sm:text-base text-[#132E29] placeholder:text-[#9AA09A] transition focus:bg-white focus:outline-none focus:ring-2 ${fieldErrors.memorableMoment
+              ? "border-[#B8423E] focus:border-[#B8423E] focus:ring-[#B8423E]/20"
+              : "border-[#DDD4BE] focus:border-[#0B433B] focus:ring-[#0B433B]/15"
+              }`}
           />
           {fieldErrors.memorableMoment && (
             <p className="text-sm font-medium text-[#B8423E]" role="alert">
