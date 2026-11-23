@@ -24,6 +24,7 @@ export function validateFeedbackForm(
   const errors: FeedbackFieldErrors = {};
 
   const trimmedName = values.fullName.trim().replace(/\s+/g, " ");
+  const selectedEntity = values.entity.trim();
   const selectedDivision = values.division.trim();
   const trimmedOtherDivision = values.otherDivision.trim().replace(/\s+/g, " ");
   const trimmedFeedback = values.feedback.trim();
@@ -35,6 +36,10 @@ export function validateFeedbackForm(
     errors.fullName = "Nama lengkap minimal terdiri dari 2 karakter.";
   } else if (trimmedName.length > 100) {
     errors.fullName = "Nama lengkap maksimal 100 karakter.";
+  }
+
+  if (!selectedEntity) {
+    errors.entity = "Silakan pilih entitas Anda.";
   }
 
   let resolvedDivision = selectedDivision;
@@ -75,6 +80,7 @@ export function validateFeedbackForm(
     errors: {},
     payload: {
       full_name: trimmedName,
+      entity: selectedEntity,
       division: resolvedDivision,
       feedback: trimmedFeedback,
       rating: values.rating,
@@ -107,6 +113,30 @@ export async function submitNusafaithFeedback(
 
     if (error) {
       console.error("Supabase insert error:", error);
+
+      // Fallback toleran jika kolom 'entity' belum sempat ditambahkan di Supabase
+      if (
+        error.message?.includes("entity") ||
+        error.code === "PGRST204" ||
+        error.message?.toLowerCase().includes("column")
+      ) {
+        const fallbackPayload = {
+          full_name: validation.payload.full_name,
+          division: `${validation.payload.entity} - ${validation.payload.division}`.slice(0, 100),
+          feedback: validation.payload.feedback,
+          rating: validation.payload.rating,
+          memorable_moment: validation.payload.memorable_moment,
+        };
+
+        const { error: fallbackError } = await supabase
+          .from("nusafaith_feedback")
+          .insert([fallbackPayload]);
+
+        if (!fallbackError) {
+          return { ok: true };
+        }
+      }
+
       return {
         ok: false,
         errorMessage:
@@ -126,4 +156,3 @@ export async function submitNusafaithFeedback(
     };
   }
 }
-

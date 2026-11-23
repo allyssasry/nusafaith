@@ -1,5 +1,6 @@
 export interface FeedbackFormValues {
   fullName: string;
+  entity: string;
   division: string;
   otherDivision: string;
   feedback: string;
@@ -9,6 +10,7 @@ export interface FeedbackFormValues {
 
 export interface FeedbackInsertPayload {
   full_name: string;
+  entity: string;
   division: string;
   feedback: string;
   rating: number;
@@ -21,6 +23,7 @@ export type FeedbackFieldErrors = Partial<
 
 export interface SubmittedParticipant {
   fullName: string;
+  entity?: string;
   division: string;
   rating: number;
 }
@@ -32,4 +35,3 @@ export const RATING_LABELS: Record<number, string> = {
   4: "Puas",
   5: "Sangat Puas",
 };
-

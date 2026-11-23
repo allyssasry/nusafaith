@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { StarRating } from "@/components/StarRating";
 import { DIVISION_OPTIONS, OTHER_DIVISION_OPTION } from "@/config/divisions";
+import { ENTITY_OPTIONS } from "@/config/entities";
 import {
   submitNusafaithFeedback,
   validateFeedbackForm,
@@ -28,6 +29,7 @@ interface FeedbackFormProps {
 
 const INITIAL_VALUES: FeedbackFormValues = {
   fullName: "",
+  entity: "",
   division: "",
   otherDivision: "",
   feedback: "",
@@ -97,13 +99,14 @@ export function FeedbackForm({ onSuccess }: FeedbackFormProps) {
         }
         setSubmitError(
           result.errorMessage ??
-          "Terjadi kesalahan saat menyimpan feedback. Silakan coba lagi."
+            "Terjadi kesalahan saat menyimpan feedback. Silakan coba lagi."
         );
         return;
       }
 
       onSuccess({
         fullName: validation.payload.full_name,
+        entity: validation.payload.entity,
         division: validation.payload.division,
         rating: validation.payload.rating,
       });
@@ -181,10 +184,11 @@ export function FeedbackForm({ onSuccess }: FeedbackFormProps) {
             onChange={(e) => updateField("fullName", e.target.value)}
             placeholder="Masukkan Nama Lengkap"
             aria-invalid={Boolean(fieldErrors.fullName)}
-            className={`w-full rounded-xl border bg-[#FCFBF8] px-4 py-3 text-sm sm:text-base text-[#132E29] placeholder:text-[#9AA09A] transition focus:bg-white focus:outline-none focus:ring-2 ${fieldErrors.fullName
-              ? "border-[#B8423E] focus:border-[#B8423E] focus:ring-[#B8423E]/20"
-              : "border-[#DDD4BE] focus:border-[#0B433B] focus:ring-[#0B433B]/15"
-              }`}
+            className={`w-full rounded-xl border bg-[#FCFBF8] px-4 py-3 text-sm sm:text-base text-[#132E29] placeholder:text-[#9AA09A] transition focus:bg-white focus:outline-none focus:ring-2 ${
+              fieldErrors.fullName
+                ? "border-[#B8423E] focus:border-[#B8423E] focus:ring-[#B8423E]/20"
+                : "border-[#DDD4BE] focus:border-[#0B433B] focus:ring-[#0B433B]/15"
+            }`}
           />
           <p className="text-xs text-[#6B6E66]">
             Nama ini akan langsung tercantum di desain greeting card digital
@@ -197,13 +201,56 @@ export function FeedbackForm({ onSuccess }: FeedbackFormProps) {
           )}
         </div>
 
-        {/* 2. Divisi */}
+        {/* 2. Entitas */}
+        <div className="space-y-2">
+          <label
+            htmlFor="entity"
+            className="block text-sm sm:text-[15px] font-semibold text-[#132E29]"
+          >
+            2. Entitas <span className="text-[#B8423E]">*</span>
+          </label>
+          <div className="relative">
+            <select
+              id="entity"
+              name="entity"
+              required
+              disabled={isSubmitting}
+              value={values.entity}
+              onChange={(e) => updateField("entity", e.target.value)}
+              aria-invalid={Boolean(fieldErrors.entity)}
+              className={`w-full appearance-none rounded-xl border bg-[#FCFBF8] px-4 py-3 pr-10 text-sm sm:text-base transition focus:bg-white focus:outline-none focus:ring-2 ${
+                values.entity ? "text-[#132E29]" : "text-[#8A918B]"
+              } ${
+                fieldErrors.entity
+                  ? "border-[#B8423E] focus:border-[#B8423E] focus:ring-[#B8423E]/20"
+                  : "border-[#DDD4BE] focus:border-[#0B433B] focus:ring-[#0B433B]/15"
+              }`}
+            >
+              <option value="" disabled>
+                Pilih entitas Anda...
+              </option>
+              {ENTITY_OPTIONS.map((entity) => (
+                <option key={entity} value={entity} className="text-[#132E29]">
+                  {entity}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B6E66]" />
+          </div>
+          {fieldErrors.entity && (
+            <p className="text-sm font-medium text-[#B8423E]" role="alert">
+              {fieldErrors.entity}
+            </p>
+          )}
+        </div>
+
+        {/* 3. Divisi */}
         <div className="space-y-2">
           <label
             htmlFor="division"
             className="block text-sm sm:text-[15px] font-semibold text-[#132E29]"
           >
-            2. Divisi <span className="text-[#B8423E]">*</span>
+            3. Divisi <span className="text-[#B8423E]">*</span>
           </label>
           <div className="relative">
             <select
@@ -214,11 +261,13 @@ export function FeedbackForm({ onSuccess }: FeedbackFormProps) {
               value={values.division}
               onChange={(e) => updateField("division", e.target.value)}
               aria-invalid={Boolean(fieldErrors.division)}
-              className={`w-full appearance-none rounded-xl border bg-[#FCFBF8] px-4 py-3 pr-10 text-sm sm:text-base transition focus:bg-white focus:outline-none focus:ring-2 ${values.division ? "text-[#132E29]" : "text-[#8A918B]"
-                } ${fieldErrors.division
+              className={`w-full appearance-none rounded-xl border bg-[#FCFBF8] px-4 py-3 pr-10 text-sm sm:text-base transition focus:bg-white focus:outline-none focus:ring-2 ${
+                values.division ? "text-[#132E29]" : "text-[#8A918B]"
+              } ${
+                fieldErrors.division
                   ? "border-[#B8423E] focus:border-[#B8423E] focus:ring-[#B8423E]/20"
                   : "border-[#DDD4BE] focus:border-[#0B433B] focus:ring-[#0B433B]/15"
-                }`}
+              }`}
             >
               <option value="" disabled>
                 Pilih divisi Anda...
@@ -259,10 +308,11 @@ export function FeedbackForm({ onSuccess }: FeedbackFormProps) {
                 onChange={(e) => updateField("otherDivision", e.target.value)}
                 placeholder="Contoh: Corporate Communication / Anak Perusahaan"
                 aria-invalid={Boolean(fieldErrors.otherDivision)}
-                className={`w-full rounded-xl border bg-white px-4 py-2.5 text-sm text-[#132E29] placeholder:text-[#9AA09A] transition focus:outline-none focus:ring-2 ${fieldErrors.otherDivision
-                  ? "border-[#B8423E] focus:border-[#B8423E] focus:ring-[#B8423E]/20"
-                  : "border-[#DDD4BE] focus:border-[#0B433B] focus:ring-[#0B433B]/15"
-                  }`}
+                className={`w-full rounded-xl border bg-white px-4 py-2.5 text-sm text-[#132E29] placeholder:text-[#9AA09A] transition focus:outline-none focus:ring-2 ${
+                  fieldErrors.otherDivision
+                    ? "border-[#B8423E] focus:border-[#B8423E] focus:ring-[#B8423E]/20"
+                    : "border-[#DDD4BE] focus:border-[#0B433B] focus:ring-[#0B433B]/15"
+                }`}
               />
               {fieldErrors.otherDivision && (
                 <p className="text-sm font-medium text-[#B8423E]" role="alert">
@@ -291,13 +341,13 @@ export function FeedbackForm({ onSuccess }: FeedbackFormProps) {
           </div>
         </div>
 
-        {/* 3. Pendapat tentang acara */}
+        {/* 4. Pendapat tentang acara */}
         <div className="space-y-2">
           <label
             htmlFor="feedback"
             className="block text-sm sm:text-[15px] font-semibold text-[#132E29]"
           >
-            3. Bagaimana pendapatmu tentang acara Nusafaith Edisi Kasmaran?{" "}
+            4. Bagaimana pendapatmu tentang acara Nusafaith Edisi Kasmaran?{" "}
             <span className="text-[#B8423E]">*</span>
           </label>
           <textarea
@@ -311,10 +361,11 @@ export function FeedbackForm({ onSuccess }: FeedbackFormProps) {
             onChange={(e) => updateField("feedback", e.target.value)}
             placeholder="Tuliskan kesan, pesan, dan saran Anda untuk acara ini..."
             aria-invalid={Boolean(fieldErrors.feedback)}
-            className={`w-full resize-y rounded-xl border bg-[#FCFBF8] px-4 py-3 text-sm sm:text-base text-[#132E29] placeholder:text-[#9AA09A] transition focus:bg-white focus:outline-none focus:ring-2 ${fieldErrors.feedback
-              ? "border-[#B8423E] focus:border-[#B8423E] focus:ring-[#B8423E]/20"
-              : "border-[#DDD4BE] focus:border-[#0B433B] focus:ring-[#0B433B]/15"
-              }`}
+            className={`w-full resize-y rounded-xl border bg-[#FCFBF8] px-4 py-3 text-sm sm:text-base text-[#132E29] placeholder:text-[#9AA09A] transition focus:bg-white focus:outline-none focus:ring-2 ${
+              fieldErrors.feedback
+                ? "border-[#B8423E] focus:border-[#B8423E] focus:ring-[#B8423E]/20"
+                : "border-[#DDD4BE] focus:border-[#0B433B] focus:ring-[#0B433B]/15"
+            }`}
           />
           <div className="flex items-center justify-between text-xs text-[#6B6E66]">
             <span>Kesan, pesan, maupun saran untuk panitia.</span>
@@ -327,10 +378,10 @@ export function FeedbackForm({ onSuccess }: FeedbackFormProps) {
           )}
         </div>
 
-        {/* 4. Penilaian Bintang 1-5 */}
+        {/* 5. Penilaian Bintang 1-5 */}
         <div className="space-y-2">
           <span className="block text-sm sm:text-[15px] font-semibold text-[#132E29]">
-            4. Bagaimana penilaianmu terhadap acara ini?{" "}
+            5. Bagaimana penilaianmu terhadap acara ini?{" "}
             <span className="text-[#B8423E]">*</span>
           </span>
           <StarRating
@@ -341,13 +392,13 @@ export function FeedbackForm({ onSuccess }: FeedbackFormProps) {
           />
         </div>
 
-        {/* 5. Hal paling berkesan (Opsional) */}
+        {/* 6. Hal paling berkesan (Opsional) */}
         <div className="space-y-2">
           <label
             htmlFor="memorableMoment"
             className="block text-sm sm:text-[15px] font-semibold text-[#132E29]"
           >
-            5. Apa hal yang paling berkesan selama mengikuti acara ini?{" "}
+            6. Apa hal yang paling berkesan selama mengikuti acara ini?{" "}
             <span className="ml-1 text-xs font-normal text-[#6B6E66]">
               (Opsional)
             </span>
@@ -362,10 +413,11 @@ export function FeedbackForm({ onSuccess }: FeedbackFormProps) {
             onChange={(e) => updateField("memorableMoment", e.target.value)}
             placeholder="Ceritakan momen, kutipan materi, atau suasana yang paling berkesan..."
             aria-invalid={Boolean(fieldErrors.memorableMoment)}
-            className={`w-full resize-y rounded-xl border bg-[#FCFBF8] px-4 py-3 text-sm sm:text-base text-[#132E29] placeholder:text-[#9AA09A] transition focus:bg-white focus:outline-none focus:ring-2 ${fieldErrors.memorableMoment
-              ? "border-[#B8423E] focus:border-[#B8423E] focus:ring-[#B8423E]/20"
-              : "border-[#DDD4BE] focus:border-[#0B433B] focus:ring-[#0B433B]/15"
-              }`}
+            className={`w-full resize-y rounded-xl border bg-[#FCFBF8] px-4 py-3 text-sm sm:text-base text-[#132E29] placeholder:text-[#9AA09A] transition focus:bg-white focus:outline-none focus:ring-2 ${
+              fieldErrors.memorableMoment
+                ? "border-[#B8423E] focus:border-[#B8423E] focus:ring-[#B8423E]/20"
+                : "border-[#DDD4BE] focus:border-[#0B433B] focus:ring-[#0B433B]/15"
+            }`}
           />
           {fieldErrors.memorableMoment && (
             <p className="text-sm font-medium text-[#B8423E]" role="alert">
@@ -416,4 +468,3 @@ export function FeedbackForm({ onSuccess }: FeedbackFormProps) {
     </form>
   );
 }
-
