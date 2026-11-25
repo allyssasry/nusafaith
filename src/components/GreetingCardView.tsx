@@ -26,6 +26,7 @@ export function GreetingCardView({
   onCreateAnother,
 }: GreetingCardViewProps) {
   const cardRef = useRef<HTMLDivElement>(null);
+  const [readyDataUrl, setReadyDataUrl] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{
     type: "success" | "error";
@@ -35,13 +36,23 @@ export function GreetingCardView({
   const filename = buildGreetingCardFilename(participant.fullName);
 
   async function handleDownload() {
-    if (!cardRef.current || isDownloading) return;
+    if (isDownloading) return;
 
     setStatusMessage(null);
     setIsDownloading(true);
 
     try {
-      const dataUrl = await renderGreetingCardPngDataUrl(cardRef.current);
+      // Gunakan gambar hasil baking yang sudah siap langsung (0 delay)
+      const dataUrl =
+        readyDataUrl ||
+        (cardRef.current
+          ? await renderGreetingCardPngDataUrl(cardRef.current)
+          : null);
+
+      if (!dataUrl) {
+        throw new Error("Gambar belum siap.");
+      }
+
       triggerPngDownload(dataUrl, filename);
       setStatusMessage({
         type: "success",
@@ -96,7 +107,12 @@ export function GreetingCardView({
         <GreetingCardPreview
           fullName={participant.fullName}
           cardRef={cardRef}
+          onBaked={(url) => setReadyDataUrl(url)}
         />
+
+        <p className="mt-2 text-center text-xs text-[#6B6E66]">
+          💡 Di handphone, kamu bisa langsung <strong>tekan &amp; tahan gambar kartu</strong> di atas lalu pilih <strong>Save to Photos</strong>.
+        </p>
 
         {/* Status Toast / Feedback Download */}
         {statusMessage && (

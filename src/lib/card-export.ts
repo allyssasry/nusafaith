@@ -38,8 +38,8 @@ function getExportOptions() {
     height: CARD_HEIGHT,
     canvasWidth: CARD_WIDTH,
     canvasHeight: CARD_HEIGHT,
-    pixelRatio: 2, // Menghasilkan resolusi tinggi 3840 x 2160 px (4K)
-    cacheBust: true,
+    pixelRatio: 1, // 1920 x 1080 px (1:1 sesuai resolusi asli template, tajam & cepat di HP)
+    cacheBust: false,
     style: {
       transform: "none",
       margin: "0",
@@ -92,4 +92,3 @@ export function triggerPngDownload(dataUrlOrBlob: string | Blob, filename: strin
     setTimeout(() => URL.revokeObjectURL(href), 5000);
   }
 }
-
