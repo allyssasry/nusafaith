@@ -11,7 +11,6 @@ import {
   UserCheck,
 } from "lucide-react";
 import { StarRating } from "@/components/StarRating";
-import { DIVISION_OPTIONS, OTHER_DIVISION_OPTION } from "@/config/divisions";
 import { ENTITY_OPTIONS } from "@/config/entities";
 import {
   submitNusafaithFeedback,
@@ -31,7 +30,6 @@ const INITIAL_VALUES: FeedbackFormValues = {
   fullName: "",
   entity: "",
   division: "",
-  otherDivision: "",
   feedback: "",
   rating: 0,
   memorableMoment: "",
@@ -43,8 +41,6 @@ export function FeedbackForm({ onSuccess }: FeedbackFormProps) {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const isOtherDivision = values.division === OTHER_DIVISION_OPTION;
-
   function updateField<K extends keyof FeedbackFormValues>(
     field: K,
     value: FeedbackFormValues[K]
@@ -52,20 +48,12 @@ export function FeedbackForm({ onSuccess }: FeedbackFormProps) {
     setValues((prev) => ({
       ...prev,
       [field]: value,
-      ...(field === "division" && value !== OTHER_DIVISION_OPTION
-        ? { otherDivision: "" }
-        : {}),
     }));
 
     setFieldErrors((prev) => {
-      if (!prev[field] && !(field === "division" && prev.otherDivision)) {
-        return prev;
-      }
+      if (!prev[field]) return prev;
       const next = { ...prev };
       delete next[field];
-      if (field === "division") {
-        delete next.otherDivision;
-      }
       return next;
     });
 
@@ -244,7 +232,7 @@ export function FeedbackForm({ onSuccess }: FeedbackFormProps) {
           )}
         </div>
 
-        {/* 3. Divisi */}
+        {/* 3. Divisi (Input Teks) */}
         <div className="space-y-2">
           <label
             htmlFor="division"
@@ -252,74 +240,27 @@ export function FeedbackForm({ onSuccess }: FeedbackFormProps) {
           >
             3. Divisi <span className="text-[#B8423E]">*</span>
           </label>
-          <div className="relative">
-            <select
-              id="division"
-              name="division"
-              required
-              disabled={isSubmitting}
-              value={values.division}
-              onChange={(e) => updateField("division", e.target.value)}
-              aria-invalid={Boolean(fieldErrors.division)}
-              className={`w-full appearance-none rounded-xl border bg-[#FCFBF8] px-4 py-3 pr-10 text-sm sm:text-base transition focus:bg-white focus:outline-none focus:ring-2 ${
-                values.division ? "text-[#132E29]" : "text-[#8A918B]"
-              } ${
-                fieldErrors.division
-                  ? "border-[#B8423E] focus:border-[#B8423E] focus:ring-[#B8423E]/20"
-                  : "border-[#DDD4BE] focus:border-[#0B433B] focus:ring-[#0B433B]/15"
-              }`}
-            >
-              <option value="" disabled>
-                Pilih divisi Anda...
-              </option>
-              {DIVISION_OPTIONS.map((division) => (
-                <option
-                  key={division}
-                  value={division}
-                  className="text-[#132E29]"
-                >
-                  {division}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B6E66]" />
-          </div>
+          <input
+            id="division"
+            name="division"
+            type="text"
+            required
+            maxLength={100}
+            disabled={isSubmitting}
+            value={values.division}
+            onChange={(e) => updateField("division", e.target.value)}
+            placeholder="Masukkan Divisi Anda..."
+            aria-invalid={Boolean(fieldErrors.division)}
+            className={`w-full rounded-xl border bg-[#FCFBF8] px-4 py-3 text-sm sm:text-base text-[#132E29] placeholder:text-[#9AA09A] transition focus:bg-white focus:outline-none focus:ring-2 ${
+              fieldErrors.division
+                ? "border-[#B8423E] focus:border-[#B8423E] focus:ring-[#B8423E]/20"
+                : "border-[#DDD4BE] focus:border-[#0B433B] focus:ring-[#0B433B]/15"
+            }`}
+          />
           {fieldErrors.division && (
             <p className="text-sm font-medium text-[#B8423E]" role="alert">
               {fieldErrors.division}
             </p>
-          )}
-
-          {isOtherDivision && (
-            <div className="mt-3 space-y-2 rounded-xl border border-[#DFBE7A]/70 bg-[#FAF2DF]/35 p-4">
-              <label
-                htmlFor="otherDivision"
-                className="block text-xs sm:text-sm font-semibold text-[#0B433B]"
-              >
-                Sebutkan Divisi Anda <span className="text-[#B8423E]">*</span>
-              </label>
-              <input
-                id="otherDivision"
-                name="otherDivision"
-                type="text"
-                maxLength={85}
-                disabled={isSubmitting}
-                value={values.otherDivision}
-                onChange={(e) => updateField("otherDivision", e.target.value)}
-                placeholder="Contoh: Corporate Communication / Anak Perusahaan"
-                aria-invalid={Boolean(fieldErrors.otherDivision)}
-                className={`w-full rounded-xl border bg-white px-4 py-2.5 text-sm text-[#132E29] placeholder:text-[#9AA09A] transition focus:outline-none focus:ring-2 ${
-                  fieldErrors.otherDivision
-                    ? "border-[#B8423E] focus:border-[#B8423E] focus:ring-[#B8423E]/20"
-                    : "border-[#DDD4BE] focus:border-[#0B433B] focus:ring-[#0B433B]/15"
-                }`}
-              />
-              {fieldErrors.otherDivision && (
-                <p className="text-sm font-medium text-[#B8423E]" role="alert">
-                  {fieldErrors.otherDivision}
-                </p>
-              )}
-            </div>
           )}
         </div>
       </section>

@@ -1,4 +1,3 @@
-import { OTHER_DIVISION_OPTION } from "@/config/divisions";
 import { getSupabaseClient } from "@/lib/supabase/client";
 import type {
   FeedbackFieldErrors,
@@ -25,8 +24,7 @@ export function validateFeedbackForm(
 
   const trimmedName = values.fullName.trim().replace(/\s+/g, " ");
   const selectedEntity = values.entity.trim();
-  const selectedDivision = values.division.trim();
-  const trimmedOtherDivision = values.otherDivision.trim().replace(/\s+/g, " ");
+  const trimmedDivision = values.division.trim().replace(/\s+/g, " ");
   const trimmedFeedback = values.feedback.trim();
   const trimmedMoment = values.memorableMoment.trim();
 
@@ -42,17 +40,12 @@ export function validateFeedbackForm(
     errors.entity = "Silakan pilih entitas Anda.";
   }
 
-  let resolvedDivision = selectedDivision;
-  if (!selectedDivision) {
-    errors.division = "Silakan pilih divisi Anda.";
-  } else if (selectedDivision === OTHER_DIVISION_OPTION) {
-    if (!trimmedOtherDivision) {
-      errors.otherDivision = "Silakan tuliskan nama divisi Anda.";
-    } else if (trimmedOtherDivision.length > 100) {
-      errors.otherDivision = "Nama divisi maksimal 100 karakter.";
-    } else {
-      resolvedDivision = `Lainnya: ${trimmedOtherDivision}`.slice(0, 100);
-    }
+  if (!trimmedDivision) {
+    errors.division = "Divisi wajib diisi.";
+  } else if (trimmedDivision.length < 2) {
+    errors.division = "Divisi minimal terdiri dari 2 karakter.";
+  } else if (trimmedDivision.length > 100) {
+    errors.division = "Divisi maksimal 100 karakter.";
   }
 
   if (!trimmedFeedback) {
@@ -81,7 +74,7 @@ export function validateFeedbackForm(
     payload: {
       full_name: trimmedName,
       entity: selectedEntity,
-      division: resolvedDivision,
+      division: trimmedDivision,
       feedback: trimmedFeedback,
       rating: values.rating,
       memorable_moment: trimmedMoment.length > 0 ? trimmedMoment : null,

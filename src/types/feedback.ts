@@ -2,7 +2,6 @@ export interface FeedbackFormValues {
   fullName: string;
   entity: string;
   division: string;
-  otherDivision: string;
   feedback: string;
   rating: number;
   memorableMoment: string;
