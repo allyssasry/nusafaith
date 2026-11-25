@@ -5,14 +5,12 @@ import {
   CheckCircle2,
   Download,
   Loader2,
-  MessageCircle,
   RotateCcw,
   Sparkles,
 } from "lucide-react";
 import { GreetingCardPreview } from "@/components/GreetingCardPreview";
 import {
   buildGreetingCardFilename,
-  renderGreetingCardBlob,
   renderGreetingCardPngDataUrl,
   triggerPngDownload,
 } from "@/lib/card-export";
@@ -29,16 +27,15 @@ export function GreetingCardView({
 }: GreetingCardViewProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [isSharing, setIsSharing] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{
-    type: "success" | "info" | "error";
+    type: "success" | "error";
     text: string;
   } | null>(null);
 
   const filename = buildGreetingCardFilename(participant.fullName);
 
   async function handleDownload() {
-    if (!cardRef.current || isDownloading || isSharing) return;
+    if (!cardRef.current || isDownloading) return;
 
     setStatusMessage(null);
     setIsDownloading(true);
@@ -58,63 +55,6 @@ export function GreetingCardView({
       });
     } finally {
       setIsDownloading(false);
-    }
-  }
-
-  async function handleShareWhatsApp() {
-    if (!cardRef.current || isDownloading || isSharing) return;
-
-    setStatusMessage(null);
-    setIsSharing(true);
-
-    try {
-      const blob = await renderGreetingCardBlob(cardRef.current);
-      const file = new File([blob], filename, { type: "image/png" });
-      const shareText = `Terima kasih telah menjadi bagian dari NUSAFAITH – Edisi Kasmaran! Ini greeting card kenang-kenangan untuk ${participant.fullName}.`;
-
-      const canNativeShareFiles =
-        typeof navigator !== "undefined" &&
-        typeof navigator.share === "function" &&
-        typeof navigator.canShare === "function" &&
-        navigator.canShare({ files: [file] });
-
-      if (canNativeShareFiles) {
-        try {
-          await navigator.share({
-            files: [file],
-            title: "Greeting Card NUSAFAITH – Edisi Kasmaran",
-            text: shareText,
-          });
-          setStatusMessage({
-            type: "success",
-            text: "Greeting card siap dibagikan melalui WhatsApp atau aplikasi pilihanmu.",
-          });
-          return;
-        } catch (shareError) {
-          // Jika pengguna membatalkan dialog share secara sengaja, jangan paksa fallback error
-          if (
-            shareError instanceof Error &&
-            shareError.name === "AbortError"
-          ) {
-            return;
-          }
-        }
-      }
-
-      // Fallback untuk browser desktop / browser yang belum mendukung Web Share API file
-      triggerPngDownload(blob, filename);
-      setStatusMessage({
-        type: "info",
-        text: "Browser ini belum mendukung berbagi gambar langsung. Greeting card PNG telah diunduh otomatis agar kamu bisa langsung mengirimkannya lewat WhatsApp!",
-      });
-    } catch (error) {
-      console.error("Gagal membagikan greeting card:", error);
-      setStatusMessage({
-        type: "error",
-        text: "Maaf, gagal menyiapkan gambar untuk dibagikan. Silakan coba tombol Download PNG.",
-      });
-    } finally {
-      setIsSharing(false);
     }
   }
 
@@ -144,7 +84,7 @@ export function GreetingCardView({
                 <span className="font-medium text-[#0B433B]">
                   Nusafaith – Edisi Kasmaran
                 </span>
-                . Simpan atau bagikan kartu kenang-kenanganmu di bawah ini.
+                . Simpan kartu kenang-kenanganmu di bawah ini.
               </p>
             </div>
           </div>
@@ -158,15 +98,13 @@ export function GreetingCardView({
           cardRef={cardRef}
         />
 
-        {/* Status Toast / Feedback Download & Share */}
+        {/* Status Toast / Feedback Download */}
         {statusMessage && (
           <div
             role="status"
             className={`mt-4 rounded-xl border px-4 py-3 text-sm font-medium ${
               statusMessage.type === "success"
                 ? "border-[#0B433B]/20 bg-[#EEF6F3] text-[#0B433B]"
-                : statusMessage.type === "info"
-                ? "border-[#C8A156]/40 bg-[#FAF2DF] text-[#6D4E15]"
                 : "border-[#B8423E]/30 bg-[#FDF3F2] text-[#8F2D2A]"
             }`}
           >
@@ -176,51 +114,30 @@ export function GreetingCardView({
 
         {/* Action Buttons */}
         <div className="mt-5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-          <div className="flex flex-col sm:flex-row gap-3">
-            <button
-              type="button"
-              onClick={handleDownload}
-              disabled={isDownloading || isSharing}
-              className="inline-flex items-center justify-center gap-2.5 rounded-xl bg-gradient-to-r from-[#0B433B] to-[#125C51] px-5 py-3 text-sm sm:text-base font-semibold text-[#FAF2DF] shadow-[0_10px_25px_-8px_rgba(11,67,59,0.45)] transition hover:brightness-110 active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0B433B] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-65 cursor-pointer"
-            >
-              {isDownloading ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Menyiapkan PNG...
-                </>
-              ) : (
-                <>
-                  <Download className="h-4 w-4" />
-                  Download Greeting Card
-                </>
-              )}
-            </button>
-
-            <button
-              type="button"
-              onClick={handleShareWhatsApp}
-              disabled={isDownloading || isSharing}
-              className="inline-flex items-center justify-center gap-2.5 rounded-xl border border-[#1E8E5A]/35 bg-[#EFFAF4] px-5 py-3 text-sm sm:text-base font-semibold text-[#136A42] transition hover:bg-[#E1F5EA] active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1E8E5A] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-65 cursor-pointer"
-            >
-              {isSharing ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Menyiapkan Gambar...
-                </>
-              ) : (
-                <>
-                  <MessageCircle className="h-4 w-4" />
-                  Share via WhatsApp
-                </>
-              )}
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={handleDownload}
+            disabled={isDownloading}
+            className="inline-flex items-center justify-center gap-2.5 rounded-xl bg-gradient-to-r from-[#0B433B] to-[#125C51] px-6 py-3.5 text-sm sm:text-base font-semibold text-[#FAF2DF] shadow-[0_10px_25px_-8px_rgba(11,67,59,0.45)] transition hover:brightness-110 active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0B433B] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-65 cursor-pointer"
+          >
+            {isDownloading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Menyiapkan PNG...
+              </>
+            ) : (
+              <>
+                <Download className="h-4 w-4" />
+                Download Greeting Card
+              </>
+            )}
+          </button>
 
           <button
             type="button"
             onClick={onCreateAnother}
-            disabled={isDownloading || isSharing}
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#DDD4BE] bg-[#FCFBF8] px-4 py-3 text-sm font-semibold text-[#364A44] transition hover:border-[#0B433B]/40 hover:bg-[#FAF2DF]/50 hover:text-[#0B433B] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0B433B] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
+            disabled={isDownloading}
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#DDD4BE] bg-[#FCFBF8] px-5 py-3 text-sm font-semibold text-[#364A44] transition hover:border-[#0B433B]/40 hover:bg-[#FAF2DF]/50 hover:text-[#0B433B] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0B433B] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
           >
             <RotateCcw className="h-4 w-4" />
             Buat Greeting Card Lagi
@@ -230,4 +147,3 @@ export function GreetingCardView({
     </div>
   );
 }
-
