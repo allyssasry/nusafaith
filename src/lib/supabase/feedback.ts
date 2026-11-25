@@ -114,11 +114,26 @@ export async function submitNusafaithFeedback(
     if (error) {
       console.error("Supabase insert error:", error);
 
-      // Fallback toleran jika kolom 'entity' belum sempat ditambahkan di Supabase
+      // 1. Cek jika network / project tidak bisa dihubungi (Paused atau URL tidak aktif)
+      const errorMsg = error.message?.toLowerCase() || "";
+      if (
+        errorMsg.includes("fetch failed") ||
+        errorMsg.includes("failed to fetch") ||
+        errorMsg.includes("enotfound") ||
+        errorMsg.includes("network")
+      ) {
+        return {
+          ok: false,
+          errorMessage:
+            "Tidak dapat terhubung ke server database Supabase. Kemungkinan project Supabase Anda sedang berstatus 'PAUSED' (terjeda). Silakan buka Supabase Dashboard dan klik tombol 'Restore project' (atau 'Resume'), lalu tunggu 1-2 menit.",
+        };
+      }
+
+      // 2. Fallback toleran jika kolom 'entity' belum sempat ditambahkan di Supabase
       if (
         error.message?.includes("entity") ||
         error.code === "PGRST204" ||
-        error.message?.toLowerCase().includes("column")
+        errorMsg.includes("column")
       ) {
         const fallbackPayload = {
           full_name: validation.payload.full_name,
@@ -137,22 +152,44 @@ export async function submitNusafaithFeedback(
         }
       }
 
+      // 3. Cek jika ditolak oleh Row Level Security (RLS)
+      if (
+        errorMsg.includes("row-level security") ||
+        error.code === "42501"
+      ) {
+        return {
+          ok: false,
+          errorMessage:
+            "Penyimpanan ditolak oleh policy keamanan (RLS) Supabase. Pastikan policy di file supabase/schema.sql sudah dijalankan di Supabase SQL Editor.",
+        };
+      }
+
       return {
         ok: false,
-        errorMessage:
-          "Gagal menyimpan data ke database. Pastikan tabel & policy Supabase sudah aktif, lalu coba lagi.",
+        errorMessage: `Gagal menyimpan data ke database (${error.message || "Pastikan tabel & policy Supabase sudah aktif"}).`,
       };
     }
 
     return { ok: true };
   } catch (err) {
-    const message =
-      err instanceof Error
-        ? err.message
-        : "Terjadi kendala jaringan saat menghubungi server.";
+    const rawMessage = err instanceof Error ? err.message : String(err);
+    const lower = rawMessage.toLowerCase();
+
+    if (
+      lower.includes("fetch failed") ||
+      lower.includes("failed to fetch") ||
+      lower.includes("enotfound")
+    ) {
+      return {
+        ok: false,
+        errorMessage:
+          "Tidak dapat terhubung ke server database Supabase. Kemungkinan project Supabase Anda sedang berstatus 'PAUSED'. Silakan buka Supabase Dashboard dan klik tombol 'Restore project'.",
+      };
+    }
+
     return {
       ok: false,
-      errorMessage: message,
+      errorMessage: `Terjadi kendala koneksi: ${rawMessage}`,
     };
   }
 }
